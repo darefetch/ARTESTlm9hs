@@ -6,6 +6,28 @@
         <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+        <script>
+            AFRAME.registerComponent('marker-handler', {
+                init: function () {
+                    var marker = document.querySelector('#animated-marker');
+                    var model = document.querySelector('#bowser-model');
+                    var lastPosition = model.getAttribute('position');
+                    var lastRotation = model.getAttribute('rotation');
+
+                    marker.addEventListener('markerFound', function () {
+                        // Save the model's position and rotation when marker is found
+                        lastPosition = model.getAttribute('position');
+                        lastRotation = model.getAttribute('rotation');
+                    });
+
+                    marker.addEventListener('markerLost', function () {
+                        // Keep the model in the last position and rotation when marker is lost
+                        model.setAttribute('position', lastPosition);
+                        model.setAttribute('rotation', lastRotation);
+                    });
+                }
+            });
+        </script>
     </head>
 
     <body style="margin: 0; overflow: hidden;">
@@ -17,6 +39,7 @@
             id="scene"
             embedded
             gesture-detector
+            marker-handler
         >
             <a-assets>
                 <a-asset-item
@@ -33,7 +56,6 @@
                 raycaster="objects: .clickable"
                 emitevents="true"
                 cursor="fuse: false; rayOrigin: mouse;"
-                id="markerA"
             >
                 <a-entity
                     id="bowser-model"
